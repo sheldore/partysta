@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>党员数据管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>党员数据管理系统</h1>
+            <p>支持Excel表格上传、模板比对和数据汇总</p>
+        </header>
+
+        <main>
+            <!-- 单位选择 -->
+            <section class="unit-selection">
+                <h2>第一步：选择单位</h2>
+                <div class="unit-management">
+                    <div class="unit-select-container">
+                        <select id="unitSelect" class="form-control">
+                            <option value="">请选择单位</option>
+                            <option value="燕子山矿">中共晋能控股煤业集团燕子山矿委员会</option>
+                            <option value="其他矿1">中共晋能控股煤业集团其他矿1委员会</option>
+                            <option value="其他矿2">中共晋能控股煤业集团其他矿2委员会</option>
+                        </select>
+                        <button id="manageUnitsBtn" class="btn btn-secondary">管理单位</button>
+                    </div>
+                    
+                    <!-- 单位管理面板 -->
+                    <div id="unitManagementPanel" class="unit-panel" style="display: none;">
+                        <h3>单位管理</h3>
+                        <div class="unit-upload-section">
+                            <label>上传单位Excel表格：</label>
+                            <div class="file-upload">
+                                <input type="file" id="unitFile" accept=".xlsx,.xls" hidden>
+                                <div class="upload-area" onclick="document.getElementById('unitFile').click()">
+                                    <i class="upload-icon">📋</i>
+                                    <p>点击上传单位列表Excel文件</p>
+                                    <span class="file-info">Excel格式：第一列为单位简称，第二列为单位全称</span>
+                                </div>
+                            </div>
+                            <div class="file-status" id="unitFileStatus"></div>
+                        </div>
+                        
+                        <div class="unit-template-section">
+                            <h4>Excel模板格式：</h4>
+                            <table class="template-table">
+                                <thead>
+                                    <tr>
+                                        <th>单位简称</th>
+                                        <th>单位全称</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>燕子山矿</td>
+                                        <td>中共晋能控股煤业集团燕子山矿委员会</td>
+                                    </tr>
+                                    <tr>
+                                        <td>其他矿1</td>
+                                        <td>中共晋能控股煤业集团其他矿1委员会</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button id="downloadUnitTemplate" class="btn btn-info">下载模板</button>
+                        </div>
+                        
+                        <div class="unit-actions">
+                            <button id="saveUnitsBtn" class="btn btn-success">保存单位列表</button>
+                            <button id="cancelUnitsBtn" class="btn btn-secondary">取消</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 基础数据上传 -->
+            <section class="base-data-upload">
+                <h2>第二步：上传基础数据</h2>
+                <div class="upload-group">
+                    <div class="upload-item">
+                        <label>单机花名（党员列表导出数据）</label>
+                        <div class="file-upload" id="localDataUpload">
+                            <input type="file" id="localDataFile" accept=".xlsx,.xls" hidden>
+                            <div class="upload-area" onclick="document.getElementById('localDataFile').click()">
+                                <i class="upload-icon">📁</i>
+                                <p>点击或拖拽上传文件</p>
+                                <span class="file-info">支持 .xlsx, .xls 格式</span>
+                            </div>
+                        </div>
+                        <div class="file-status" id="localDataStatus"></div>
+                    </div>
+
+                    <div class="upload-item">
+                        <label>全国花名（委员会模板）</label>
+                        <div class="file-upload" id="nationalDataUpload">
+                            <input type="file" id="nationalDataFile" accept=".xlsx,.xls" hidden>
+                            <div class="upload-area" onclick="document.getElementById('nationalDataFile').click()">
+                                <i class="upload-icon">📁</i>
+                                <p>点击或拖拽上传文件</p>
+                                <span class="file-info">支持 .xlsx, .xls 格式</span>
+                            </div>
+                        </div>
+                        <div class="file-status" id="nationalDataStatus"></div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button id="compareBtn" class="btn btn-primary" disabled>开始比对</button>
+                    <button id="debugBtn" class="btn btn-secondary"
+                        onclick="window.partyDataManager?.debugStatus()">调试状态</button>
+                </div>
+                <div id="compareResult" class="result-area"></div>
+            </section>
+
+            <!-- 明细数据上传 -->
+            <section class="detail-data-upload">
+                <h2>第三步：上传明细数据</h2>
+                <div class="upload-instructions">
+                    <div class="instruction-item">
+                        <strong>📋 严格模板要求：</strong>上传的Excel文件字段顺序必须与表格文件夹中的模板文件完全一致
+                    </div>
+                    <div class="instruction-item">
+                        <strong>🔍 严格验证：</strong>系统会检查字段数量、名称、顺序，任何不匹配都会导致验证失败
+                    </div>
+                    <div class="instruction-item">
+                        <strong>📁 模板位置：</strong>请使用表格文件夹中对应类型的模板文件（如：表格/1党员花名册.xlsx）
+                    </div>
+                    <div class="instruction-item">
+                        <strong>🔄 数据汇总：</strong>验证通过后自动去除空行并汇总到数据库，包含单位信息
+                    </div>
+                </div>
+                <div class="detail-uploads">
+                    <div class="detail-item" data-type="1">
+                        <label>1党员花名册</label>
+                        <input type="file" accept=".xlsx,.xls" class="detail-file">
+                        <div class="detail-status"></div>
+                    </div>
+                    <div class="detail-item" data-type="2">
+                        <label>2党组织名单</label>
+                        <input type="file" accept=".xlsx,.xls" class="detail-file">
+                        <div class="detail-status"></div>
+                    </div>
+                    <div class="detail-item" data-type="4">
+                        <label>4入党申请人名册</label>
+                        <input type="file" accept=".xlsx,.xls" class="detail-file">
+                        <div class="detail-status"></div>
+                    </div>
+                    <div class="detail-item" data-type="5">
+                        <label>5发展党员名册</label>
+                        <input type="file" accept=".xlsx,.xls" class="detail-file">
+                        <div class="detail-status"></div>
+                    </div>
+                    <div class="detail-item" data-type="6">
+                        <label>6转入党员名册</label>
+                        <input type="file" accept=".xlsx,.xls" class="detail-file">
+                        <div class="detail-status"></div>
+                    </div>
+                    <div class="detail-item" data-type="7">
+                        <label>7转出党员名册</label>
+                        <input type="file" accept=".xlsx,.xls" class="detail-file">
+                        <div class="detail-status"></div>
+                    </div>
+                    <div class="detail-item" data-type="10">
+                        <label>10死亡党员名册</label>
+                        <input type="file" accept=".xlsx,.xls" class="detail-file">
+                        <div class="detail-status"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 统计和导出 -->
+            <section class="statistics">
+                <h2>第四步：数据统计与导出</h2>
+                <div class="stats-container">
+                    <div class="stats-summary" id="statsSummary">
+                        <p>请先选择单位并上传数据</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 进度提示 -->
+        <div id="progressModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p id="progressText">处理中...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
