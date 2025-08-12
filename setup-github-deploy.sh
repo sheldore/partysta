@@ -64,10 +64,10 @@ git add .
 
 # 检查是否有需要提交的更改
 if git diff --cached --quiet; then
-    echo "✅ 没有需要提交的更改"
-else
-    echo "📝 提交更改..."
-    commit_message="Initial commit: Party member management system for ClawCloud
+    # 检查是否有任何提交
+    if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
+        echo "📝 创建初始提交..."
+        commit_message="Initial commit: Party member management system for ClawCloud
 
 Features:
 - Multi-user collaboration support
@@ -82,8 +82,28 @@ Deployment:
 - Deploy path: /root/apps/party-system
 - Access URL: https://deapps.huihys.ip-ddns.com/partysta"
 
+        git commit -m "$commit_message"
+        echo "✅ 初始提交完成"
+    else
+        echo "✅ 没有需要提交的更改"
+    fi
+else
+    echo "📝 提交更改..."
+    commit_message="Update: Party member management system - $(date '+%Y-%m-%d %H:%M:%S')"
     git commit -m "$commit_message"
     echo "✅ 提交完成"
+fi
+
+# 确保在 main 分支上
+current_branch=$(git branch --show-current 2>/dev/null || git rev-parse --abbrev-ref HEAD 2>/dev/null)
+if [ "$current_branch" != "main" ]; then
+    echo "🔄 切换到 main 分支..."
+    if git show-ref --verify --quiet refs/heads/main; then
+        git checkout main
+    else
+        git checkout -b main
+    fi
+    echo "✅ 已切换到 main 分支"
 fi
 
 # 推送到 GitHub
