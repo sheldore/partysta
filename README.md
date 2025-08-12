@@ -14,33 +14,32 @@
 
 ## 🚀 快速部署
 
-### 方法一：Git 部署（推荐）
+### 方法一：完整部署流程（推荐）
 
 ```bash
-# 1. 克隆仓库
-git clone https://github.com/sheldore/partysta.git
-cd partysta
-
-# 2. 配置服务器信息
-cp server-config.example.sh server-config.sh
-nano server-config.sh  # 修改为你的服务器信息
-
-# 3. 执行 Git 部署
-chmod +x deploy/git-deploy.sh
-./deploy/git-deploy.sh
+# 一键完成：推送到 GitHub + 部署到服务器
+chmod +x full-deploy.sh
+./full-deploy.sh
 ```
 
-### 方法二：直接部署
+### 方法二：分步部署
 
 ```bash
-# 1. 上传文件到服务器
-./deploy/sync-to-server.sh
+# 步骤1: 推送到 GitHub
+chmod +x push-to-github.sh
+./push-to-github.sh
 
-# 2. 在服务器上执行
-ssh root@your-server
-cd /root/apps/party-system
-./manual-deploy.sh
+# 步骤2: 部署到服务器
+chmod +x deploy-to-server.sh
+./deploy-to-server.sh
 ```
+
+### 方法三：WebSSH 部署
+
+如果 SSH 连接失败，使用 WebSSH：
+- 访问: https://deapps.huihys.ip-ddns.com:8888
+- 用户名: `club`, 密码: `123456`
+- 参考: [WebSSH 部署指南](WEBSSH-DEPLOY.md)
 
 ## 🌐 访问地址
 
@@ -81,43 +80,43 @@ node backend-server.js
 ```
 partysta/
 ├── 📄 核心应用文件
-│   ├── backend-server.js      # Node.js 后端服务器
-│   ├── index.html            # 前端页面
-│   ├── script-multiuser.js   # 多用户前端脚本
-│   ├── styles.css           # 样式文件
-│   └── package.json         # 依赖配置
+│   └── core/                # 核心代码
+│       ├── backend-server.js    # Node.js 后端服务器
+│       ├── index.html           # 前端页面
+│       ├── script-multiuser.js  # 多用户前端脚本
+│       ├── styles.css          # 样式文件
+│       └── package.json        # 依赖配置
 ├── 🔧 部署脚本
-│   ├── deploy-setup.sh      # 主要部署脚本
+│   ├── deploy.sh            # 一键部署脚本 ⭐
 │   ├── manual-deploy.sh     # 手动部署脚本
 │   ├── service.sh           # 服务管理脚本
 │   └── start-app.sh         # 应用启动脚本
-├── 📁 工具脚本
-│   ├── scripts/linux/       # Linux/macOS 脚本
-│   ├── scripts/windows/     # Windows 脚本
-│   └── scripts/powershell/  # PowerShell 脚本
-├── 📁 部署工具
-│   └── deploy/              # 各种部署方案
-└── 📁 配置示例
-    └── configs/             # Nginx 等配置示例
+├── ⚙️ 配置文件
+│   ├── supervisor-party.conf   # 进程管理配置
+│   ├── nginx-party.conf        # Nginx 配置
+│   └── server-config.example.sh # 服务器配置示例
+└── 📖 文档
+    ├── README.md            # 项目说明
+    └── LICENSE             # 许可证
 ```
 
 ## 🔧 常用命令
 
 ```bash
-# 服务管理
-./service.sh start    # 启动服务
-./service.sh stop     # 停止服务
-./service.sh restart  # 重启服务
-./service.sh status   # 查看状态
-./service.sh logs     # 查看日志
+# 完整部署流程
+./full-deploy.sh         # 推送到 GitHub + 部署到服务器
 
-# DNS 和 SSL
-./scripts/linux/check-dns.sh        # 检查 DNS 解析
-./scripts/linux/quick-ssl-setup.sh  # 配置 SSL 证书
+# 分步部署
+./push-to-github.sh      # 推送代码到 GitHub
+./deploy-to-server.sh    # 部署到服务器
 
-# 部署更新
-./deploy/git-deploy.sh              # Git 部署
-./deploy/sync-to-server.sh          # 同步部署
+# 服务器端命令
+./deploy.sh              # 服务器一键部署
+./service.sh start       # 启动服务
+./service.sh stop        # 停止服务
+./service.sh restart     # 重启服务
+./service.sh status      # 查看状态
+./service.sh logs        # 查看日志
 ```
 
 ## 🔒 安全配置

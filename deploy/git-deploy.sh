@@ -26,37 +26,28 @@ echo "   服务器: $SERVER_HOST"
 echo "   部署路径: $SERVER_PATH"
 echo ""
 
-# 检查是否在 Git 仓库中
-if [ ! -d "../.git" ] && [ ! -d ".git" ]; then
-    echo "❌ 当前目录不是 Git 仓库"
-    echo "💡 请先初始化 Git 仓库："
-    echo "   git init"
-    echo "   git remote add origin $GIT_REPO"
-    exit 1
-fi
-
-# 本地提交代码
-echo "📝 提交本地更改..."
+# 本地提交代码（如果有更改）
+echo "📝 检查本地更改..."
 if [ -d "../.git" ]; then
     cd ..
+elif [ ! -d ".git" ]; then
+    echo "❌ 当前目录不是 Git 仓库"
+    exit 1
 fi
 
 # 检查是否有未提交的更改
 if ! git diff --quiet || ! git diff --cached --quiet; then
     git add .
-    read -p "请输入提交信息: " commit_message
+    read -p "请输入提交信息 (回车使用默认): " commit_message
     if [ -z "$commit_message" ]; then
         commit_message="Update party system - $(date '+%Y-%m-%d %H:%M:%S')"
     fi
     git commit -m "$commit_message"
-    echo "✅ 本地提交完成"
+    git push origin $BRANCH
+    echo "✅ 代码已推送到 GitHub"
 else
     echo "✅ 没有需要提交的更改"
 fi
-
-# 推送到远程仓库
-echo "📤 推送到 GitHub..."
-git push origin $BRANCH
 
 # 在服务器上拉取更新
 echo "📥 在服务器上拉取更新..."
@@ -67,6 +58,7 @@ cd $SERVER_PATH
 if [ ! -d ".git" ]; then
     echo "📦 首次部署，克隆仓库..."
     cd /root/apps
+    rm -rf party-system 2>/dev/null || true
     git clone $GIT_REPO party-system
     cd party-system
 else
@@ -77,11 +69,14 @@ fi
 # 设置权限
 chmod +x *.sh
 
-# 自动部署
-echo "🚀 执行自动部署..."
-./manual-deploy.sh
+# 执行一键部署
+echo "🚀 执行一键部署..."
+./deploy.sh
 
 echo "✅ Git 部署完成！"
 EOF
 
-echo "🎉 部署完成！访问地址: $APP_URL"
+echo ""
+echo "🎉 部署完成！"
+echo "📍 访问地址: $APP_URL"
+echo "🔧 管理命令: ssh $SERVER_USER@$SERVER_HOST 'cd $SERVER_PATH && ./service.sh status'"
