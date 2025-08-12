@@ -2,13 +2,26 @@
 
 # 部署到 ClawCloud 服务器
 
-# 服务器配置
-SERVER_HOST="deapps.huihys.ip-ddns.com"
-SERVER_USER="root"
-SERVER_PORT="22"
-SERVER_PATH="/root/apps/party-system"
-GIT_REPO="https://github.com/sheldore/partysta.git"
-BRANCH="main"
+# 加载地址配置
+if [ -f "config/addresses.sh" ]; then
+    source config/addresses.sh
+    SERVER_HOST="$MAIN_HOST"
+    SERVER_USER="$SSH_USER"
+    SERVER_PORT="$SSH_PORT"
+    SERVER_PATH="$DEPLOY_PATH"
+    GIT_REPO="$GIT_REPO"
+    BRANCH="$GIT_BRANCH"
+else
+    # 默认配置
+    SERVER_HOST="deapps.huihys.ip-ddns.com"
+    SERVER_USER="root"
+    SERVER_PORT="22"
+    SERVER_PATH="/root/apps/party-system"
+    GIT_REPO="https://github.com/sheldore/partysta.git"
+    BRANCH="main"
+    WEBSSH_URL="https://dewebssh.huihys.ip-ddns.com"
+    DUFS_URL="https://dedufs.huihys.ip-ddns.com"
+fi
 
 echo "🚀 部署到 ClawCloud 服务器..."
 echo "📋 部署信息："
@@ -24,8 +37,8 @@ if ! ssh -p $SERVER_PORT -o ConnectTimeout=10 -o BatchMode=yes $SERVER_USER@$SER
     echo "❌ SSH 连接失败"
     echo ""
     echo "🌐 替代方案: 使用 WebSSH"
-    echo "1. 访问: https://$SERVER_HOST:8888"
-    echo "2. 用户名: club, 密码: 123456"
+    echo "1. 访问: $WEBSSH_URL"
+    echo "2. 用户名: ${WEBSSH_USER:-club}, 密码: ${WEBSSH_PASS:-123456}"
     echo "3. 执行以下命令:"
     echo ""
     echo "   sudo su -"
@@ -81,8 +94,10 @@ if [ $? -eq 0 ]; then
     echo "🎉 部署成功完成！"
     echo ""
     echo "📍 访问地址:"
-    echo "   主应用: https://$SERVER_HOST/partysta"
-    echo "   健康检查: https://$SERVER_HOST/partysta/api/health"
+    echo "   主应用: ${APP_URL:-https://$SERVER_HOST/partysta}"
+    echo "   健康检查: ${HEALTH_URL:-https://$SERVER_HOST/partysta/api/health}"
+    echo "   WebSSH: ${WEBSSH_URL:-https://dewebssh.huihys.ip-ddns.com}"
+    echo "   文件管理: ${DUFS_URL:-https://dedufs.huihys.ip-ddns.com}"
     echo ""
     echo "🔧 管理命令:"
     echo "   查看状态: ssh $SERVER_USER@$SERVER_HOST 'cd $SERVER_PATH && ./service.sh status'"

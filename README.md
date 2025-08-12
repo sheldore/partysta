@@ -37,7 +37,7 @@ chmod +x deploy-to-server.sh
 ### 方法三：WebSSH 部署
 
 如果 SSH 连接失败，使用 WebSSH：
-- 访问: https://deapps.huihys.ip-ddns.com:8888
+- 访问: https://dewebssh.huihys.ip-ddns.com
 - 用户名: `club`, 密码: `123456`
 - 参考: [WebSSH 部署指南](WEBSSH-DEPLOY.md)
 
@@ -47,6 +47,8 @@ chmod +x deploy-to-server.sh
 
 - **主应用**: `https://deapps.huihys.ip-ddns.com/partysta`
 - **健康检查**: `https://deapps.huihys.ip-ddns.com/partysta/api/health`
+- **WebSSH 终端**: `https://dewebssh.huihys.ip-ddns.com` (club/123456)
+- **文件管理**: `https://dedufs.huihys.ip-ddns.com` (club/123456)
 
 ## 🔐 默认配置
 

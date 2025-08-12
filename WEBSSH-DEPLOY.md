@@ -5,7 +5,7 @@
 ## 🚀 部署步骤
 
 ### 1. 访问 WebSSH
-- **地址**: https://deapps.huihys.ip-ddns.com:8888
+- **地址**: https://dewebssh.huihys.ip-ddns.com
 - **用户名**: `club`
 - **密码**: `123456`
 
